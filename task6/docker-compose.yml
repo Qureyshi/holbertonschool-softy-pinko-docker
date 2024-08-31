@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  back-end-1:
+    build:
+      context: ./back-end
+      dockerfile: Dockerfile
+    image: softy-pinko-back-end:task6
+    expose:
+      - "5252"  # Internal port mapping for inter-service communication
+    networks:
+      - task6-network
+
+  back-end-2:
+    build:
+      context: ./back-end
+      dockerfile: Dockerfile
+    image: softy-pinko-back-end:task6
+    expose:
+      - "5252"  # Internal port mapping for inter-service communication
+    networks:
+      - task6-network
+
+  front-end:
+    build:
+      context: ./front-end
+      dockerfile: Dockerfile
+    image: softy-pinko-front-end:task6
+    ports:
+      - "9000:9000"  # Expose the front-end service to the host
+    depends_on:
+      - proxy
+    networks:
+      - task6-network
+
+  proxy:
+    build:
+      context: ./proxy
+      dockerfile: Dockerfile
+    image: softy-pinko-proxy:task6
+    ports:
+      - "80:80"  # Expose the proxy server to the host
+    depends_on:
+      - back-end-1
+      - back-end-2
+    networks:
+      - task6-network
+
+networks:
+  task6-network:
+    driver: bridge
