@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  back-end:
+    build:
+      context: ./back-end
+      dockerfile: Dockerfile
+    image: softy-pinko-back-end:task5
+    # Remove port mapping to external ports
+    ports:
+      - "5252:5252"  # Internal port mapping is still needed for inter-service communication
+    networks:
+      - task5-network
+
+  front-end:
+    build:
+      context: ./front-end
+      dockerfile: Dockerfile
+    image: softy-pinko-front-end:task5
+    # Remove port mapping to external ports
+    ports:
+      - "9000:9000"  # Internal port mapping is still needed for inter-service communication
+    depends_on:
+      - back-end
+    networks:
+      - task5-network
+
+  proxy:
+    build:
+      context: ./proxy
+      dockerfile: Dockerfile
+    image: softy-pinko-proxy:task5
+    ports:
+      - "80:80"  # Expose the proxy server to the host
+    depends_on:
+      - front-end
+      - back-end
+    networks:
+      - task5-network
+
+networks:
+  task5-network:
+    driver: bridge
